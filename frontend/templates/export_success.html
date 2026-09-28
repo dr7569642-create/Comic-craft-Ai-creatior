@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Export Success — ComicCraft{% endblock %}
+
+{% block content %}
+<div class="export-success-container">
+    <div class="success-card">
+        <div class="success-icon-badge">🎉</div>
+        <span class="comic-stamp">CERTIFIED AI ORIGINAL</span>
+        
+        <h1 class="success-title">Comic Exported Successfully!</h1>
+        <p class="success-subtitle">
+            Your 5-panel comic <strong>"{{ title }}"</strong> has been compiled into a high-resolution, print-ready PDF document containing all 5 AI-generated illustrations.
+        </p>
+
+        <div class="success-details-box">
+            <div class="detail-row">
+                <span class="detail-label">Status:</span>
+                <span class="detail-val text-success">✓ Generated & Validated</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Panels:</span>
+                <span class="detail-val">5 Full-Color AI Panels</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Format:</span>
+                <span class="detail-val">Standard A4 Document (PDF)</span>
+            </div>
+        </div>
+
+        <div class="success-actions">
+            {% if pdf_url %}
+            <a href="{{ pdf_url }}" download class="btn-primary-comic btn-lg" id="btn-success-download">
+                <span class="btn-icon">📥</span>
+                <span class="btn-text">DOWNLOAD PDF NOW</span>
+            </a>
+            <a href="{{ pdf_url }}" target="_blank" class="btn-secondary-comic" id="btn-open-pdf">
+                Open in Browser Tab
+            </a>
+            {% endif %}
+            <a href="/" class="btn-secondary-comic" id="btn-success-new">
+                ✨ Create Another Comic
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}ComicCraft — Create AI Comics with Real Images{% endblock %}
+
+{% block content %}
+<div class="creator-container">
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+        <div class="hero-tag">GENUINE AI COMIC ENGINE • ZERO PLACEHOLDERS</div>
+        <h1 class="hero-title">COMICCRAFT</h1>
+        <p class="hero-tagline">AI Comic Story Creator</p>
+        <p class="hero-description">
+            Transform your imagination into a fully illustrated, 5-panel comic narrative. 
+            Scripted by <strong>Google Gemini</strong> and painted panel-by-panel with <strong>Real Generative AI Art</strong>.
+        </p>
+    </div>
+
+    <!-- API Credential Warning Banner (if Gemini key missing) -->
+    {% if not has_gemini_key %}
+    <div class="alert-box alert-warning" id="api-key-alert">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+            <strong>Google Gemini API Key Recommended:</strong>
+            <p><strong>GEMINI_API_KEY</strong> is not detected. (Get one free at <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a>). Add it to your <code>.env</code> file for live Gemini story scripting.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Error Banner -->
+    {% if error %}
+    <div class="alert-box alert-danger" id="error-alert">
+        <div class="alert-icon">💥</div>
+        <div class="alert-content">
+            <strong>Generation Error:</strong>
+            <p>{{ error }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Creator Grid -->
+    <div class="creator-grid">
+        <!-- Story Creator Form -->
+        <div class="creator-card">
+            <div class="card-header">
+                <span class="card-badge">STEP 1</span>
+                <h2 class="card-title">Craft Your Story Script</h2>
+            </div>
+
+            <!-- Quick Inspiration Starters -->
+            <div class="preset-section">
+                <span class="preset-label">⚡ Quick Inspiration:</span>
+                <div class="preset-chips">
+                    <button type="button" class="preset-btn" onclick="applyPreset('robot')">Maya & The Quantum Bot</button>
+                    <button type="button" class="preset-btn" onclick="applyPreset('cyberpunk')">Neon Detective</button>
+                    <button type="button" class="preset-btn" onclick="applyPreset('fantasy')">The Lost Griffin</button>
+                    <button type="button" class="preset-btn" onclick="applyPreset('space')">Mars Colony Rift</button>
+                </div>
+            </div>
+
+            <form action="/generate" method="POST" id="comic-form" class="comic-form">
+                <!-- Story Prompt -->
+                <div class="form-group">
+                    <label for="prompt" class="form-label">
+                        <span class="label-text">1. Story Premise & Plot</span>
+                        <span class="label-hint">What epic or mysterious adventure happens?</span>
+                    </label>
+                    <textarea 
+                        id="prompt" 
+                        name="prompt" 
+                        rows="4" 
+                        required 
+                        class="form-control form-textarea"
+                        placeholder="e.g. A brilliant young mechanic named Maya uncovers an ancient dormant battle automaton buried beneath her floating sky-island workshop..."
+                    >{{ form_data.prompt if form_data else '' }}</textarea>
+                </div>
+
+                <div class="form-row">
+                    <!-- Main Character -->
+                    <div class="form-group col-6">
+                        <label for="main_character" class="form-label">
+                            <span class="label-text">2. Main Character</span>
+                            <span class="label-hint">Name & appearance</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="main_character" 
+                            name="main_character" 
+                            required 
+                            class="form-control"
+                            placeholder="e.g. Maya, teen inventor with copper goggles and aviator jacket"
+                            value="{{ form_data.main_character if form_data else '' }}"
+                        >
+                    </div>
+
+                    <!-- Setting -->
+                    <div class="form-group col-6">
+                        <label for="setting" class="form-label">
+                            <span class="label-text">3. World & Setting</span>
+                            <span class="label-hint">Where does it take place?</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="setting" 
+                            name="setting" 
+                            required 
+                            class="form-control"
+                            placeholder="e.g. Neo-Aetheria, a steampunk floating city among storm clouds"
+                            value="{{ form_data.setting if form_data else '' }}"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <!-- Tone -->
+                    <div class="form-group col-6">
+                        <label for="tone" class="form-label">
+                            <span class="label-text">4. Story Tone</span>
+                            <span class="label-hint">Atmosphere & emotion</span>
+                        </label>
+                        <select id="tone" name="tone" required class="form-control form-select">
+                            <option value="Adventure" {% if form_data and form_data.tone == 'Adventure' %}selected{% endif %}>Adventure & Wonder</option>
+                            <option value="Action Hero" {% if form_data and form_data.tone == 'Action Hero' %}selected{% endif %}>Action Hero & High Stakes</option>
+                            <option value="Sci-Fi Mystery" {% if form_data and form_data.tone == 'Sci-Fi Mystery' %}selected{% endif %}>Sci-Fi Mystery & Suspense</option>
+                            <option value="Dark Fantasy" {% if form_data and form_data.tone == 'Dark Fantasy' %}selected{% endif %}>Dark Fantasy & Mythic</option>
+                            <option value="Humorous & Quirky" {% if form_data and form_data.tone == 'Humorous & Quirky' %}selected{% endif %}>Humorous & Quirky</option>
+                            <option value="Cyberpunk Noir" {% if form_data and form_data.tone == 'Cyberpunk Noir' %}selected{% endif %}>Cyberpunk Noir</option>
+                        </select>
+                    </div>
+
+                    <!-- Art Style -->
+                    <div class="form-group col-6">
+                        <label for="art_style" class="form-label">
+                            <span class="label-text">5. Comic Art Style</span>
+                            <span class="label-hint">Visual drawing technique</span>
+                        </label>
+                        <select id="art_style" name="art_style" required class="form-control form-select">
+                            <option value="Comic Book" {% if form_data and form_data.art_style == 'Comic Book' %}selected{% endif %}>Classic American Comic Book (Dynamic Inks & Colors)</option>
+                            <option value="Graphic Novel" {% if form_data and form_data.art_style == 'Graphic Novel' %}selected{% endif %}>Graphic Novel (Moody Cinematic Shadows)</option>
+                            <option value="Manga" {% if form_data and form_data.art_style == 'Manga' %}selected{% endif %}>Japanese Manga (Expressive Linework & Screen Tones)</option>
+                            <option value="Anime" {% if form_data and form_data.art_style == 'Anime' %}selected{% endif %}>Vibrant Anime (Rich Cel Shading)</option>
+                            <option value="Watercolor" {% if form_data and form_data.art_style == 'Watercolor' %}selected{% endif %}>Hand-painted Watercolor Illustration</option>
+                            <option value="Fantasy Illustration" {% if form_data and form_data.art_style == 'Fantasy Illustration' %}selected{% endif %}>Epic Fantasy Digital Painting</option>
+                            <option value="Cinematic" {% if form_data and form_data.art_style == 'Cinematic' %}selected{% endif %}>Photorealistic Cinematic Frame</option>
+                            <option value="Cartoon" {% if form_data and form_data.art_style == 'Cartoon' %}selected{% endif %}>Bold Saturday Morning Cartoon</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-actions">
+                    <button type="submit" id="generate-btn" class="btn-primary-comic">
+                        <span class="btn-icon">⚡</span>
+                        <span class="btn-text">GENERATE 5-PANEL COMIC</span>
+                        <span class="btn-subtext">Real AI Script • Real AI Artwork • PDF Ready</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sidebar / Tools & Specs -->
+        <aside class="creator-sidebar">
+            <!-- Pipeline Guarantee Card -->
+            <div class="sidebar-card feature-card">
+                <h3 class="sidebar-title">🛡️ Real AI Guarantee</h3>
+                <ul class="guarantee-list">
+                    <li><span class="bullet-check">✓</span> <strong>Gemini Flash</strong> outlines 5 dramatic story beats</li>
+                    <li><span class="bullet-check">✓</span> <strong>Gemini Pro</strong> scripts dialogues & consistent character cues</li>
+                    <li><span class="bullet-check">✓</span> <strong>Generative AI Art</strong> paints 5 distinct authentic illustrations</li>
+                    <li><span class="bullet-check">✓</span> <strong>fpdf2 Engine</strong> binds your finished comic into a printable PDF</li>
+                    <li><span class="bullet-cross">✕</span> No Demo Mode or fake canvas placeholders</li>
+                </ul>
+            </div>
+
+            <!-- Diagnostics / Single Image Tester Card -->
+            <div class="sidebar-card test-card">
+                <div class="sidebar-header-row">
+                    <h3 class="sidebar-title">🎨 AI Image Tester</h3>
+                    <span class="mini-badge">DIAGNOSTIC</span>
+                </div>
+                <p class="sidebar-desc">
+                    Test your AI image generation engine and verify artwork creation independently.
+                </p>
+                <div class="test-input-wrapper">
+                    <input 
+                        type="text" 
+                        id="test-image-prompt" 
+                        class="form-control test-control" 
+                        value="Cyberpunk cyborg superhero in neon city alleyway, comic book ink art style"
+                        placeholder="Enter test prompt..."
+                    >
+                    <button type="button" id="btn-run-test-image" class="btn-secondary-comic" onclick="runSingleImageTest()">
+                        Generate Test Image
+                    </button>
+                </div>
+                <div id="test-image-result" class="test-result-box" style="display:none;">
+                    <div id="test-spinner" class="mini-spinner" style="display:none;"></div>
+                    <p id="test-message" class="test-msg"></p>
+                    <div id="test-img-preview" class="test-preview-container"></div>
+                </div>
+            </div>
+
+            <!-- Quick Specs Info -->
+            <div class="sidebar-card info-card">
+                <h3 class="sidebar-title">📐 5-Panel Comic Flow</h3>
+                <div class="flow-steps">
+                    <div class="flow-step"><strong>Panel 1:</strong> Introduction & World Setup</div>
+                    <div class="flow-step"><strong>Panel 2:</strong> Catalyst & Discovery</div>
+                    <div class="flow-step"><strong>Panel 3:</strong> Conflict & Rising Stakes</div>
+                    <div class="flow-step"><strong>Panel 4:</strong> Climax & Action Peak</div>
+                    <div class="flow-step"><strong>Panel 5:</strong> Resolution & Aftermath</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- Animated Loading Overlay (Multi-Stage Comic Creation) -->
+<div id="loading-overlay" class="loading-overlay" style="display:none;">
+    <div class="loading-modal">
+        <div class="loading-comic-header">
+            <span class="loading-badge">AI FACTORY IN ACTION</span>
+            <h2 class="loading-title">COMIC IN PRODUCTION!</h2>
+        </div>
+
+        <div class="comic-speech-cloud">
+            <div class="loader-spinner"></div>
+            <p id="loading-status-text" class="loading-text">Starting AI Comic Engine...</p>
+        </div>
+
+        <!-- Progress Steps Tracker -->
+        <div class="progress-tracker">
+            <div class="step-item active" id="pstep-1">
+                <span class="step-num">1</span>
+                <span class="step-label">Outline Script</span>
+            </div>
+            <div class="step-item" id="pstep-2">
+                <span class="step-num">2</span>
+                <span class="step-label">Panel Scripting</span>
+            </div>
+            <div class="step-item" id="pstep-3">
+                <span class="step-num">3</span>
+                <span class="step-label">5 AI Illustrations</span>
+            </div>
+            <div class="step-item" id="pstep-4">
+                <span class="step-num">4</span>
+                <span class="step-label">Layout Assembly</span>
+            </div>
+            <div class="step-item" id="pstep-5">
+                <span class="step-num">5</span>
+                <span class="step-label">PDF Export</span>
+            </div>
+        </div>
+
+        <p class="loading-note">
+            Generative AI image diffusion takes ~25-45 seconds to generate 5 high-resolution comic panels. Please stay on this page!
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ComicCraft — AI Comic Story Creator{% endblock %}</title>
+    <meta name="description" content="Turn your creative story ideas into full 5-panel illustrated comic books powered by Google Gemini and real AI image generation.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Outfit:wght@300;400;500;600;700;800&family=Comic+Neue:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="comic-app-body">
+    <!-- Header / Navbar -->
+    <header class="app-header">
+        <div class="header-container">
+            <a href="/" class="brand-logo" id="logo-link">
+                <span class="logo-badge">BOOM!</span>
+                <span class="logo-title">COMICCRAFT</span>
+                <span class="logo-subtitle">AI STUDIO</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="/" class="nav-item" id="nav-home">Create Comic</a>
+                <a href="/docs" target="_blank" class="nav-item" id="nav-docs">API Docs</a>
+                <a href="/health" target="_blank" class="nav-badge-link" id="nav-health">
+                    <span class="pulse-indicator"></span>
+                    <span class="health-text">Online</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <p class="footer-brand">COMICCRAFT — AI Comic Story Creator</p>
+                <p class="footer-desc">Powered by Google Gemini and Generative AI Art. Every panel is an authentic AI creation.</p>
+            </div>
+            <div class="footer-right">
+                <span class="tag-badge">5 Real AI Panels</span>
+                <span class="tag-badge">High-Res PDF Export</span>
+                <span class="tag-badge">Character Continuity</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- App JavaScript -->
+    <script src="/static/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

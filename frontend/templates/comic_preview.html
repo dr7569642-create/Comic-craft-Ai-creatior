@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ comic.title }} — ComicCraft AI Preview{% endblock %}
+
+{% block content %}
+<div class="preview-container">
+    <!-- Comic Showcase Header -->
+    <section class="comic-showcase-header">
+        <div class="header-badges">
+            <span class="badge-tag badge-style">{{ comic.art_style }}</span>
+            <span class="badge-tag badge-tone">{{ comic.tone }}</span>
+            <span class="badge-tag badge-hero">Hero: {{ comic.main_character }}</span>
+        </div>
+
+        <h1 class="comic-main-title">{{ comic.title }}</h1>
+        <p class="comic-premise"><strong>Premise:</strong> {{ comic.prompt }}</p>
+
+        <!-- Top Actions -->
+        <div class="comic-action-bar">
+            {% if comic.pdf_url %}
+            <a href="{{ comic.pdf_url }}" download class="btn-primary-comic btn-download" id="btn-top-download">
+                <span class="btn-icon">📥</span>
+                <span class="btn-text">DOWNLOAD COMIC PDF</span>
+            </a>
+            <a href="/export-success?pdf_url={{ comic.pdf_url }}&title={{ comic.title|urlencode }}" class="btn-secondary-comic" id="btn-view-export">
+                Export Summary Page
+            </a>
+            {% endif %}
+            <a href="/" class="btn-secondary-comic" id="btn-create-another">
+                ✨ Create Another Comic
+            </a>
+        </div>
+    </section>
+
+    <!-- Comic Strips / Panels Grid (5 Panels) -->
+    <section class="panels-showcase">
+        <div class="panels-grid">
+            {% for panel in comic.panels %}
+            <article class="comic-panel-card" id="panel-card-{{ panel.panel_number }}">
+                <!-- Panel Header Bar -->
+                <div class="panel-header-bar">
+                    <span class="panel-tag">PANEL {{ panel.panel_number }} OF 5</span>
+                    {% if panel.mood %}
+                    <span class="mood-badge">{{ panel.mood }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Real AI Generated Panel Artwork (60-70% visual area) -->
+                <div class="panel-image-wrapper">
+                    <img 
+                        src="{{ panel.image_url }}" 
+                        alt="Comic Panel {{ panel.panel_number }} - {{ panel.scene_description }}"
+                        class="panel-ai-img"
+                        loading="eager"
+                        onclick="openImageLightbox('{{ panel.image_url }}', 'Panel {{ panel.panel_number }}')"
+                    >
+                    <span class="zoom-hint">🔍 Click to enlarge</span>
+                </div>
+
+                <!-- Comic Narrative Content -->
+                <div class="panel-narrative-area">
+                    <!-- Narration Caption Box -->
+                    {% if panel.narration %}
+                    <div class="narration-box">
+                        <span class="caption-label">NARRATION</span>
+                        <p class="caption-text">{{ panel.narration }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Speech Bubble Dialogue -->
+                    {% if panel.dialogue %}
+                    <div class="speech-bubble-wrapper">
+                        <div class="comic-speech-bubble">
+                            <span class="bubble-tail"></span>
+                            <p class="dialogue-text">"{{ panel.dialogue }}"</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Expandable Director's Notes -->
+                    <details class="panel-details-toggle">
+                        <summary class="toggle-summary">🎬 Director's Scene Prompt</summary>
+                        <div class="toggle-body">
+                            <p><strong>Scene Description:</strong> {{ panel.scene_description }}</p>
+                            {% if panel.image_prompt %}
+                            <p class="prompt-text"><strong>AI Image Prompt:</strong> <code>{{ panel.image_prompt }}</code></p>
+                            {% endif %}
+                        </div>
+                    </details>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Bottom Actions Banner -->
+    <section class="bottom-actions-banner">
+        <div class="banner-inner">
+            <h2 class="banner-title">Love Your Comic Story?</h2>
+            <p class="banner-sub">Download your 5-page PDF edition formatted for printing and sharing.</p>
+            <div class="banner-buttons">
+                {% if comic.pdf_url %}
+                <a href="{{ comic.pdf_url }}" download class="btn-primary-comic" id="btn-bottom-download">
+                    <span class="btn-icon">📥</span> Download Full Comic PDF
+                </a>
+                {% endif %}
+                <a href="/" class="btn-secondary-comic">
+                    Create Another Adventure
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Lightbox Modal for Full View -->
+<div id="image-lightbox" class="lightbox-modal" style="display:none;" onclick="closeImageLightbox()">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+        <button type="button" class="lightbox-close" onclick="closeImageLightbox()">✕</button>
+        <img id="lightbox-img" src="" alt="Enlarged Comic Art" class="lightbox-art">
+        <p id="lightbox-caption" class="lightbox-caption"></p>
+    </div>
+</div>
+{% endblock %}
